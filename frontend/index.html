@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fırsat Radar</title>
+
+<style>
+body{
+  font-family:Arial,sans-serif;
+  max-width:1000px;
+  margin:40px auto;
+  padding:20px;
+}
+
+.card{
+  border:1px solid #ddd;
+  border-radius:12px;
+  padding:16px;
+  margin-bottom:12px;
+}
+
+h1{
+  margin-bottom:30px;
+}
+</style>
+
+</head>
+<body>
+
+<h1>Fırsat Radar</h1>
+
+<div id="list"></div>
+
+<script>
+
+fetch("https://firsat-radar-backend.onrender.com/opportunities")
+.then(r=>r.json())
+.then(data=>{
+
+const list=document.getElementById("list");
+
+data.forEach(item=>{
+
+list.innerHTML += `
+<div class="card">
+<h3>${item.title}</h3>
+<p>${item.company}</p>
+<p>${item.city}</p>
+<a href="${item.url}" target="_blank">
+İlana Git
+</a>
+</div>
+`;
+
+});
+
+});
+
+</script>
+
+</body>
+</html>
