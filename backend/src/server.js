@@ -1,3 +1,4 @@
+const pool = require("./db");
 const express = require("express");
 const cors = require("cors");
 
@@ -18,6 +19,22 @@ app.get("/health", (req, res) => {
     success: true,
     message: "Backend aktif"
   });
+});
+
+app.get("/db-test", async (req, res) => {
+  try {
+    const result = await pool.query("SELECT NOW()");
+
+    res.json({
+      success: true,
+      time: result.rows[0]
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
 });
 
 const PORT = process.env.PORT || 3000;
