@@ -1,14 +1,8 @@
 {
   "name": "firsat-radar-frontend",
+  "private": true,
   "version": "1.0.0",
   "scripts": {
-    "start": "next start",
-    "build": "next build"
-  },
-  "dependencies": {
-    "next": "^15.3.3",
-    "react": "^19.0.0",
-    "react-dom": "^19.0.0"
-  },
-  "devDependencies": {}
+    "start": "npx serve ."
+  }
 }
