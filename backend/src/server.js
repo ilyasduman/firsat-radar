@@ -58,3 +58,34 @@ app.get("/opportunities", async (req, res) => {
     });
   }
 });
+app.post("/opportunities", async (req, res) => {
+  try {
+    const { title, company, city, url, source } = req.body;
+
+    if (!title) {
+      return res.status(400).json({
+        success: false,
+        error: "title zorunlu"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO opportunities (title, company, city, url, source)
+      VALUES ($1, $2, $3, $4, $5)
+      RETURNING *
+      `,
+      [title, company, city, url, source]
+    );
+
+    res.json({
+      success: true,
+      data: result.rows[0]
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
