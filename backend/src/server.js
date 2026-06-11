@@ -89,3 +89,19 @@ app.post("/opportunities", async (req, res) => {
     });
   }
 });
+app.get("/listings", async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT *
+      FROM listings
+      ORDER BY opportunity_score DESC
+    `);
+
+    res.json(result.rows);
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
