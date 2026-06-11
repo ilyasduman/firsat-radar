@@ -105,3 +105,87 @@ app.get("/listings", async (req, res) => {
     });
   }
 });
+app.post("/listings", async (req, res) => {
+  try {
+    const {
+      title,
+      city,
+      district,
+      neighborhood,
+      price,
+      gross_m2,
+      net_m2,
+      room_count,
+      building_age,
+      floor_info,
+      elevator,
+      url,
+      source,
+      discount_percent,
+      opportunity_score,
+      status
+    } = req.body;
+
+    if (!title || !city || !district || !price) {
+      return res.status(400).json({
+        success: false,
+        error: "title, city, district ve price zorunlu"
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO listings (
+        title,
+        city,
+        district,
+        neighborhood,
+        price,
+        gross_m2,
+        net_m2,
+        room_count,
+        building_age,
+        floor_info,
+        elevator,
+        url,
+        source,
+        discount_percent,
+        opportunity_score,
+        status
+      )
+      VALUES (
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16
+      )
+      RETURNING *
+      `,
+      [
+        title,
+        city,
+        district,
+        neighborhood,
+        price,
+        gross_m2,
+        net_m2,
+        room_count,
+        building_age,
+        floor_info,
+        elevator,
+        url,
+        source || "Manuel",
+        discount_percent || 0,
+        opportunity_score || 0,
+        status || "active"
+      ]
+    );
+
+    res.json({
+      success: true,
+      data: result.rows[0]
+    });
+  } catch (err) {
+    res.status(500).json({
+      success: false,
+      error: err.message
+    });
+  }
+});
