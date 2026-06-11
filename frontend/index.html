@@ -25,7 +25,25 @@ h1{
 
 .subtitle{
   color:#64748b;
-  margin-bottom:28px;
+  margin-bottom:24px;
+}
+
+.filters{
+  background:white;
+  border-radius:20px;
+  padding:18px;
+  margin-bottom:22px;
+  box-shadow:0 10px 30px rgba(15,23,42,.07);
+  display:grid;
+  grid-template-columns:repeat(5,1fr);
+  gap:12px;
+}
+
+.filters input{
+  padding:12px;
+  border:1px solid #d1d5db;
+  border-radius:12px;
+  font-size:14px;
 }
 
 .card{
@@ -92,10 +110,22 @@ h1{
   font-weight:700;
 }
 
+.empty{
+  background:white;
+  border-radius:18px;
+  padding:24px;
+  color:#64748b;
+}
+
+@media(max-width:900px){
+  .filters{grid-template-columns:1fr 1fr;}
+}
+
 @media(max-width:700px){
   .top{display:block;}
   .grid{grid-template-columns:1fr;}
   .price{font-size:24px;}
+  .filters{grid-template-columns:1fr;}
 }
 </style>
 </head>
@@ -106,15 +136,29 @@ h1{
 <h1>🏠 Fırsat Radar</h1>
 <div class="subtitle">Puanı yüksek, fiyat avantajı olan satılık daire adayları</div>
 
+<div class="filters">
+  <input id="cityFilter" placeholder="İl">
+  <input id="districtFilter" placeholder="İlçe">
+  <input id="minPriceFilter" type="number" placeholder="Min Fiyat">
+  <input id="maxPriceFilter" type="number" placeholder="Max Fiyat">
+  <input id="minScoreFilter" type="number" placeholder="Min Puan">
+</div>
+
 <div id="list"></div>
 
 </div>
 
 <script>
-fetch("https://firsat-radar-backend.onrender.com/listings")
-.then(r => r.json())
-.then(data => {
+let allListings = [];
+
+function renderListings(data){
   const list = document.getElementById("list");
+  list.innerHTML = "";
+
+  if(data.length === 0){
+    list.innerHTML = `<div class="empty">Bu filtrelere uygun ilan bulunamadı.</div>`;
+    return;
+  }
 
   data.forEach(item => {
     list.innerHTML += `
@@ -139,6 +183,46 @@ fetch("https://firsat-radar-backend.onrender.com/listings")
         <a class="btn" href="${item.url}" target="_blank">🔗 İlana Git</a>
       </div>
     `;
+  });
+}
+
+function applyFilters(){
+  const city = document.getElementById("cityFilter").value.toLowerCase();
+  const district = document.getElementById("districtFilter").value.toLowerCase();
+  const minPrice = Number(document.getElementById("minPriceFilter").value);
+  const maxPrice = Number(document.getElementById("maxPriceFilter").value);
+  const minScore = Number(document.getElementById("minScoreFilter").value);
+
+  const filtered = allListings.filter(item => {
+    const itemCity = String(item.city || "").toLowerCase();
+    const itemDistrict = String(item.district || "").toLowerCase();
+    const price = Number(item.price || 0);
+    const score = Number(item.opportunity_score || 0);
+
+    if(city && !itemCity.includes(city)) return false;
+    if(district && !itemDistrict.includes(district)) return false;
+    if(minPrice && price < minPrice) return false;
+    if(maxPrice && price > maxPrice) return false;
+    if(minScore && score < minScore) return false;
+
+    return true;
+  });
+
+  renderListings(filtered);
+}
+
+fetch("https://firsat-radar-backend.onrender.com/listings")
+.then(r => r.json())
+.then(data => {
+  allListings = data;
+  renderListings(allListings);
+});
+
+["cityFilter","districtFilter","minPriceFilter","maxPriceFilter","minScoreFilter"].forEach(id => {
+  document.addEventListener("input", function(e){
+    if(e.target.id === id){
+      applyFilters();
+    }
   });
 });
 </script>
