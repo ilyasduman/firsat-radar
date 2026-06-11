@@ -7,56 +7,76 @@
 
 <style>
 body{
-  font-family:Arial,sans-serif;
-  max-width:1000px;
-  margin:40px auto;
-  padding:20px;
+  font-family: Arial, sans-serif;
+  max-width: 1200px;
+  margin: 40px auto;
+  padding: 20px;
+  background:#f5f7fa;
 }
 
 .card{
-  border:1px solid #ddd;
-  border-radius:12px;
-  padding:16px;
-  margin-bottom:12px;
+  background:white;
+  border-radius:16px;
+  padding:20px;
+  margin-bottom:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,.08);
 }
 
-h1{
-  margin-bottom:30px;
+.score{
+  display:inline-block;
+  background:#16a34a;
+  color:white;
+  padding:6px 12px;
+  border-radius:999px;
+  font-weight:bold;
+}
+
+.price{
+  font-size:24px;
+  font-weight:bold;
+  color:#dc2626;
+}
+
+.btn{
+  display:inline-block;
+  margin-top:12px;
+  padding:10px 16px;
+  background:#2563eb;
+  color:white;
+  text-decoration:none;
+  border-radius:8px;
 }
 </style>
-
 </head>
+
 <body>
 
-<h1>Fırsat Radar</h1>
+<h1>🏠 Fırsat Radar</h1>
 
 <div id="list"></div>
 
 <script>
+fetch("https://firsat-radar-backend.onrender.com/listings")
+.then(r => r.json())
+.then(data => {
+  const list = document.getElementById("list");
 
-fetch("https://firsat-radar-backend.onrender.com/opportunities")
-.then(r=>r.json())
-.then(data=>{
-
-const list=document.getElementById("list");
-
-data.forEach(item=>{
-
-list.innerHTML += `
-<div class="card">
-<h3>${item.title}</h3>
-<p>${item.company}</p>
-<p>${item.city}</p>
-<a href="${item.url}" target="_blank">
-İlana Git
-</a>
-</div>
-`;
-
+  data.forEach(item => {
+    list.innerHTML += `
+      <div class="card">
+        <div class="score">⭐ ${item.opportunity_score}</div>
+        <h2>${item.title}</h2>
+        <div class="price">${Number(item.price).toLocaleString("tr-TR")} TL</div>
+        <p>📍 ${item.city} / ${item.district} / ${item.neighborhood}</p>
+        <p>🏢 ${item.room_count}</p>
+        <p>📐 Brüt ${item.gross_m2} m² / Net ${item.net_m2} m²</p>
+        <p>🏗️ Bina Yaşı: ${item.building_age}</p>
+        <p>📉 İskonto: %${item.discount_percent}</p>
+        <a class="btn" href="${item.url}" target="_blank">İlana Git</a>
+      </div>
+    `;
+  });
 });
-
-});
-
 </script>
 
 </body>
